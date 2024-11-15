@@ -7,8 +7,16 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 import ru.lending.microservice.task.manager.entity.LoanParameter;
 
+/**
+ * Репозиторий для работы с данными параметров кредита
+ */
 @Repository
 public interface LoanParameterRepository  extends ReactiveCrudRepository<LoanParameter, Long> {
-	@Query("SELECT t.* FROM tsk.tasks_loan_parameters t where t.task_id=:taskId and t.loan_parameter_id=:loanParameterId")
-	Mono<LoanParameter> findByTaskIdAndLoanParameterId(Long taskId, Long loanParameterId);
+	/**
+	 * Поиск данных параметров кредита
+	 * @param taskId Идентификатор задачи
+	 * @return Параметры кредита
+	 */
+	@Query("SELECT t.* FROM tsk.tasks_loan_parameters t where t.task_id=:taskId")
+	Mono<LoanParameter> findByTaskId(Long taskId);
 }

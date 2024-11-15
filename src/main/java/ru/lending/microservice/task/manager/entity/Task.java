@@ -86,4 +86,8 @@ public class Task {
     /**Фактическая дата и время завершения задачи.*/
     @Column("actual_end_dt")
 	private OffsetDateTime actualEndDateTime;
+
+    /**Данные по параметрам кредита.*/
+    @Transient
+    private LoanParameter loanParameter;
 }

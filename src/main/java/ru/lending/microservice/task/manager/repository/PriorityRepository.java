@@ -5,5 +5,8 @@ import org.springframework.stereotype.Repository;
 
 import ru.lending.microservice.task.manager.entity.Priority;
 
+/**
+ * Репозиторий для работы с приоритетами задач
+ */
 @Repository
 public interface PriorityRepository  extends ReactiveCrudRepository<Priority, Long> {}

@@ -3,7 +3,14 @@ package ru.lending.microservice.task.manager.servce;
 import reactor.core.publisher.Mono;
 import ru.lending.microservice.task.manager.entity.LoanParameter;
 
+/**
+ * Сервис обработки данных параметров кредита
+ */
 public interface LoanParameterService {
-	Mono<LoanParameter> findByTaskIdAndLoanParameterId(Long taskId, Long loanParameterId);
+	/**
+	 * Создает запись в бд параметров кредита
+	 * @param lp параметры кредита
+	 * @return Созданная запись параметров кредита
+	 */
 	Mono<LoanParameter> create(LoanParameter lp);
 }

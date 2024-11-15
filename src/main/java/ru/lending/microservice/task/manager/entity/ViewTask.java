@@ -85,4 +85,8 @@ public class ViewTask {
     /**Фактическая дата и время завершения задачи.*/
     @Column("actual_end_dt")
 	private OffsetDateTime actualEndDateTime;
+    
+    /**Идентификатор параметров кредита*/
+    @Column("loan_parameter_id")
+    private Long loanParameterId;
 }

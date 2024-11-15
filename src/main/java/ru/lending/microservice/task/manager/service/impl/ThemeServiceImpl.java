@@ -39,4 +39,9 @@ public class ThemeServiceImpl implements ThemeService {
 		return repository.save(theme);
 	}
 
+	@Override
+	public Mono<Theme> findById(Long id) {
+		return repository.findById(id);
+	}
+
 }

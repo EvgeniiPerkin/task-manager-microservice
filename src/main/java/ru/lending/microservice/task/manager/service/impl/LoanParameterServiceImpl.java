@@ -23,17 +23,6 @@ public class LoanParameterServiceImpl implements LoanParameterService {
 	private CollateralRepository collateralRepository;
 
 	@Override
-	public Mono<LoanParameter> findByTaskIdAndLoanParameterId(Long taskId, Long loanParameterId) {
-		return lpRepository.findByTaskIdAndLoanParameterId(taskId, loanParameterId).flatMap(l -> 
-		Mono.just(l)
-			.zipWith(clientRepository.findByTaskIdAndLoanParameterId(l.getTaskId(), l.getLoanParameterId()).collectList())
-			.map(t -> t.getT1().setClients(t.getT2()))
-			.zipWith(collateralRepository.findByTaskIdAndLoanParameterId(l.getTaskId(), l.getLoanParameterId()).collectList())
-			.map(t -> t.getT1().setCollaterals(t.getT2()))
-				);
-	}
-
-	@Override
     @Transactional
 	public Mono<LoanParameter> create(LoanParameter lp) {
         return  lpRepository.save(lp)
@@ -44,5 +33,4 @@ public class LoanParameterServiceImpl implements LoanParameterService {
                 	collateralRepository.saveAll(lp.getCollaterals()).collectList()
 	            	.then(Mono.just(savedItem)));
 	}
-
 }

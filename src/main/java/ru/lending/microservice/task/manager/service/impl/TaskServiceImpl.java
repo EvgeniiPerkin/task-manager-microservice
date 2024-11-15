@@ -12,7 +12,10 @@ import ru.lending.microservice.task.manager.entity.Task;
 import ru.lending.microservice.task.manager.entity.ViewTask;
 import ru.lending.microservice.task.manager.entity.dto.TaskDto;
 import ru.lending.microservice.task.manager.entity.dto.ViewTaskDto;
+import ru.lending.microservice.task.manager.repository.ClientRepository;
+import ru.lending.microservice.task.manager.repository.CollateralRepository;
 import ru.lending.microservice.task.manager.repository.ConditionRepository;
+import ru.lending.microservice.task.manager.repository.LoanParameterRepository;
 import ru.lending.microservice.task.manager.repository.PriorityRepository;
 import ru.lending.microservice.task.manager.repository.TaskRepository;
 import ru.lending.microservice.task.manager.repository.ThemeRepository;
@@ -35,9 +38,18 @@ public class TaskServiceImpl implements TaskService {
 	
 	@Autowired
 	private ViewTaskRepository vewTaskRepository;
+	
+	@Autowired
+	private LoanParameterRepository loanRepository;
+
+	@Autowired
+	private ClientRepository clientRepository;
+
+	@Autowired
+	private CollateralRepository collateralRepository;
 
 	@Override
-	public Mono<Task> findById(Long id) {
+	public Mono<Task> findById(Long id) {		
 		return taskRepository.findById(id).flatMap(tsk ->
 		Mono.just(tsk)
             .zipWith(themeRepository.findById(tsk.getThemeId()))
@@ -46,7 +58,13 @@ public class TaskServiceImpl implements TaskService {
             .map(t -> t.getT1().setPriority(t.getT2()))
             .zipWith(conditionRepository.findById(tsk.getConditionId()))
             .map(t -> t.getT1().setCondition(t.getT2()))
-				);
+            .zipWith(loanRepository.findByTaskId(tsk.getId()).flatMap(lp ->
+				Mono.just(lp)
+	            .zipWith(clientRepository.findByTaskIdAndLoanParameterId(lp.getTaskId(), lp.getLoanParameterId()).collectList())
+	            .map(t -> t.getT1().setClients(t.getT2()))
+	            .zipWith(collateralRepository.findByTaskIdAndLoanParameterId(lp.getTaskId(), lp.getLoanParameterId()).collectList())
+	            .map(t -> t.getT1().setCollaterals(t.getT2()))))
+            .map(t -> t.getT1().setLoanParameter(t.getT2())));
 	}
 		
 	@Override
@@ -100,8 +118,8 @@ public class TaskServiceImpl implements TaskService {
 				.plannedEndDateTime(null)
 				.actualStartDateTime(null)
 				.actualEndDateTime(null)
+				.loanParameterId(null)
 				.build());
 		return vewTaskRepository.findBy(example, p -> p.page(pr.withSort(Sort.by("id").descending())));
 	}
-
 }

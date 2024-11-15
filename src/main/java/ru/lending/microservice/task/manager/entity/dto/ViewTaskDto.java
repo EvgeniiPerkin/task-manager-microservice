@@ -1,7 +1,7 @@
 package ru.lending.microservice.task.manager.entity.dto;
 
 /**
- * сущность для фильтрации задач
+ * Контейнер данных для фильтрации задач
  */
 public record ViewTaskDto(
 		/**
