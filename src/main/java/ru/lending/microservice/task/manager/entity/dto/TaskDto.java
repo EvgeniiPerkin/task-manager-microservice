@@ -2,6 +2,9 @@ package ru.lending.microservice.task.manager.entity.dto;
 
 import java.time.OffsetDateTime;
 
+/**
+ * 
+ */
 public record TaskDto(
 		OffsetDateTime createdAt,
 		Long themeId,
