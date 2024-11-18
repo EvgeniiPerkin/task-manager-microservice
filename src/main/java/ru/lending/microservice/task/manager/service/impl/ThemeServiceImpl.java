@@ -7,6 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.lending.microservice.task.manager.entity.Theme;
 import ru.lending.microservice.task.manager.entity.dto.ThemeDto;
+import ru.lending.microservice.task.manager.exception.ResourceNotFoundException;
 import ru.lending.microservice.task.manager.repository.ThemeRepository;
 import ru.lending.microservice.task.manager.servce.ThemeService;
 
@@ -17,7 +18,8 @@ public class ThemeServiceImpl implements ThemeService {
 
 	@Override
 	public Flux<Theme> findByDepartmentId(Long id) {
-		return repository.findByDepartmentId(id);
+		return repository.findByDepartmentId(id)
+				.switchIfEmpty(Flux.error(new ResourceNotFoundException("Ресурс не найден -" + id)));
 	}
 
 	@Override

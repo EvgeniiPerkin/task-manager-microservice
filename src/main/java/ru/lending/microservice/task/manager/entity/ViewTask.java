@@ -66,9 +66,9 @@ public class ViewTask {
     @Column("to_employee_id")
     private Long toEmployeeId;
 
-    /**Содержание\Описание задачи.*/
-    @Column("content")
-    private String content;
+    /**Заголовок задачи.*/
+    @Column("title")
+    private String title;
 
     /**Планируемая дата и время начала выполнения задачи.*/
     @Column("planned_start_dt")

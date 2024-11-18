@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS tsk.tasks (
 	from_employee_id INTEGER NOT NULL,
 	to_department_id INTEGER NOT NULL,
 	to_employee_id INTEGER,
-	content VARCHAR(100),
+	title VARCHAR(100) NOT NULL,
+	content VARCHAR(255) NOT NULL,
 	planned_start_dt TIMESTAMPTZ NOT NULL,
 	planned_end_dt TIMESTAMPTZ NOT NULL,
 	actual_start_dt TIMESTAMPTZ,
@@ -57,6 +58,7 @@ COMMENT ON COLUMN tsk.tasks.from_department_id IS 'Идентификатор о
 COMMENT ON COLUMN tsk.tasks.from_employee_id IS 'Идентификатор сотрудника поставившего задачу.';
 COMMENT ON COLUMN tsk.tasks.to_department_id IS 'Идентификатор отдела, которому поставлена задача.';
 COMMENT ON COLUMN tsk.tasks.to_employee_id IS 'Идентификатор сотрудника, которому поставлена задача.';
+COMMENT ON COLUMN tsk.tasks.title IS 'Заголовок.';
 COMMENT ON COLUMN tsk.tasks.content IS 'Содержание.';
 COMMENT ON COLUMN tsk.tasks.planned_start_dt IS 'Планируемая дата начала выполнения.';
 COMMENT ON COLUMN tsk.tasks.planned_end_dt IS 'Планируемая дата завершения.';
@@ -116,7 +118,7 @@ SELECT
 	t.from_employee_id,
 	t.to_department_id,
 	t.to_employee_id,
-	t.content,
+	t.title,
 	t.planned_start_dt,
 	t.planned_end_dt,
 	t.actual_start_dt,

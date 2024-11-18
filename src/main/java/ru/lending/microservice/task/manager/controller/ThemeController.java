@@ -17,14 +17,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.support.WebExchangeBindException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.lending.microservice.task.manager.entity.Theme;
 import ru.lending.microservice.task.manager.entity.dto.ThemeDto;
+import ru.lending.microservice.task.manager.mapper.ThemeMapper;
+import ru.lending.microservice.task.manager.response.ThemeResponse;
 import ru.lending.microservice.task.manager.servce.ThemeService;
 
 @Tag(name = "Темы задач.", description = "Запросы к конроллеру тем задач.")
@@ -45,10 +49,13 @@ public class ThemeController {
 
     @Operation(summary = "Создание новой темы.")
 	@PostMapping
-    Mono<ResponseEntity<Theme>> create(@Parameter(description = "Данные для создания темы.") @RequestBody ThemeDto theme) {
-    	LOGGER.info("Создание новой темы {}, для отдела (идентификатор): {}", theme.description(),theme.departmentId());    
-		return themeService.create(theme)
-			.map(savedTheme -> ResponseEntity.status(HttpStatus.CREATED).body(savedTheme));
+    Mono<ResponseEntity<ThemeResponse>> create(@Parameter(description = "Данные для создания темы.") @Valid @RequestBody ThemeDto theme) {
+    	LOGGER.info("Создание новой темы {}, для отдела (идентификатор): {}", theme.description(),theme.departmentId());
+    	return themeService.create(theme)
+			.map(savedTheme -> ResponseEntity.status(HttpStatus.CREATED).body(savedTheme))
+			.onErrorResume(WebExchangeBindException.class,
+					ex -> Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							.body(ThemeMapper.fromWebExchangeBindException(ex))));
 	}
 	
     @PutMapping("/{id}")

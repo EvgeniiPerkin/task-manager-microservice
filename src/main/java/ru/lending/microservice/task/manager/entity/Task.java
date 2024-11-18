@@ -67,6 +67,10 @@ public class Task {
     @Column("to_employee_id")
     private Long toEmployeeId;
 
+    /**Заголовок задачи.*/
+    @Column("title")
+    private String title;
+    
     /**Содержание\Описание задачи.*/
     @Column("content")
     private String content;
