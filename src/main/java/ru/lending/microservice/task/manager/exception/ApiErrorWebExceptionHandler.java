@@ -1,29 +1,26 @@
 package ru.lending.microservice.task.manager.exception;
 
-import static ru.lending.microservice.task.manager.exception.ErrorCode.ILLEGAL_ARGUMENT_EXCEPTION;
-import static ru.lending.microservice.task.manager.exception.ErrorCode.RESOURCE_NOT_FOUND;
-import static ru.lending.microservice.task.manager.exception.ErrorCode.GENERIC_ALREADY_EXISTS;
-
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.annotation.Order;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebInputException;
 
 import reactor.core.publisher.Mono;
 
@@ -37,70 +34,86 @@ public class ApiErrorWebExceptionHandler extends AbstractErrorWebExceptionHandle
 		super.setMessageWriters(serverCodecConfigurer.getWriters());
 		super.setMessageReaders(serverCodecConfigurer.getReaders());
 	}
+	
 	@Override
 	protected RouterFunction<ServerResponse> getRoutingFunction(ErrorAttributes errorAttributes) {
-		return RouterFunctions.route(RequestPredicates.all(), this::handleErrorResponse);
+		return RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse);
 	}
 	
-	private Mono<ServerResponse> handleErrorResponse(ServerRequest request) {
-	    Map<String, Object> errorPropertiesMap = getErrorAttributes(request, ErrorAttributeOptions.defaults());
-        Throwable throwable = (Throwable) request
-            .attribute("org.springframework.boot.web.reactive.error.DefaultErrorAttributes.ERROR")
-            .orElseThrow(() -> new IllegalStateException("Missing exception attribute in ServerWebExchange"));
-        throwable.printStackTrace();
-        ErrorCode code = ErrorCode.GENERIC_ERROR;
+	private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
+	    Map<String, Object> errorProperties = getErrorAttributes(request, ErrorAttributeOptions.defaults());
+	    
+	    Throwable throwable = (Throwable) request
+		    .attribute("org.springframework.boot.web.reactive.error.DefaultErrorAttributes.ERROR")
+		    .orElseThrow(() -> new IllegalStateException("Missing exception attribute in ServerWebExchange"));
+		
+		if (throwable instanceof WebExchangeBindException) {
+			return render((WebExchangeBindException) throwable, request, errorProperties);
+	    }
+		
+		if (throwable instanceof CustomBaseException) {
+			return render((CustomBaseException) throwable, request, errorProperties);
+		}
+		
+		return renderDefault(throwable, request, errorProperties);
+	}
 
-        if (throwable instanceof IllegalArgumentException
-            || throwable instanceof DataIntegrityViolationException
-            || throwable instanceof ServerWebInputException) {
-            code = ILLEGAL_ARGUMENT_EXCEPTION;
-        } else if (throwable instanceof ResourceNotFoundException) {
-            code = RESOURCE_NOT_FOUND;
-        } else if (throwable instanceof GenericAlreadyExistsException) {
-        	code = GENERIC_ALREADY_EXISTS;
-        }
+	private Mono<ServerResponse> render(
+			WebExchangeBindException exception,
+			ServerRequest request,
+			Map<String, Object> errorProperties) {
+    	
+		var errors = exception.getBindingResult()
+	      .getAllErrors()
+	      .stream()
+	      .map(DefaultMessageSourceResolvable::getDefaultMessage)
+	      .collect(Collectors.toList());
+		
+		var code = ErrorCode.VALIDATION_FAIL;
 
-        switch (code) {
-	        case ILLEGAL_ARGUMENT_EXCEPTION -> {
-	            errorPropertiesMap.put("status", HttpStatus.BAD_REQUEST);
-	            errorPropertiesMap.put("code", ILLEGAL_ARGUMENT_EXCEPTION.getCode());
-	            errorPropertiesMap.put("error", ILLEGAL_ARGUMENT_EXCEPTION);
-	            errorPropertiesMap.put("message", String
-	                .format("%s %s", ILLEGAL_ARGUMENT_EXCEPTION.getKey(),
-	                    throwable.getMessage()));
-	            return ServerResponse.status(HttpStatus.BAD_REQUEST)
-	                .contentType(MediaType.APPLICATION_JSON)
-	                .body(BodyInserters.fromValue(errorPropertiesMap));
-	        }
-	        case RESOURCE_NOT_FOUND -> {
-	            errorPropertiesMap.put("status", HttpStatus.NOT_FOUND);
-	            errorPropertiesMap.put("code", RESOURCE_NOT_FOUND.getCode());
-	            errorPropertiesMap.put("error", RESOURCE_NOT_FOUND);
-	            errorPropertiesMap.put("message", String
-	                .format("%s %s", RESOURCE_NOT_FOUND.getKey(),
-	                    throwable.getMessage()));
-	            return ServerResponse.status(HttpStatus.NOT_FOUND)
-	                .contentType(MediaType.APPLICATION_JSON)
-	                .body(BodyInserters.fromValue(errorPropertiesMap));
-	        }
-			case GENERIC_ALREADY_EXISTS -> {
-		        errorPropertiesMap.put("status", HttpStatus.NOT_ACCEPTABLE);
-		        errorPropertiesMap.put("code", GENERIC_ALREADY_EXISTS.getCode());
-		        errorPropertiesMap.put("error", GENERIC_ALREADY_EXISTS);
-		        errorPropertiesMap.put("message", String
-		            .format("%s %s", GENERIC_ALREADY_EXISTS.getKey(),
-		                throwable.getMessage()));
-		        return ServerResponse.status(HttpStatus.NOT_ACCEPTABLE)
-		            .contentType(MediaType.APPLICATION_JSON)
-		            .body(BodyInserters.fromValue(errorPropertiesMap));
-	        }
-		    default -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-		        .contentType(MediaType.APPLICATION_JSON)
-		        .body(BodyInserters.fromValue(errorPropertiesMap));
-        }
-        
-        return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(errorPropertiesMap));
+	    errorProperties.put("status", code.getStatus());
+	    errorProperties.put("code", code.getCode());
+	    errorProperties.put("error", "Ошибка валидации данных.");
+	    errorProperties.put("listErrors", errors);
+	    return ServerResponse
+	        .status(code.getStatus())
+	        .contentType(MediaType.APPLICATION_JSON)
+	        .body(BodyInserters.fromValue(errorProperties));
+	}
+	
+	private Mono<ServerResponse> render(
+			CustomBaseException exception,
+			ServerRequest request,
+			Map<String, Object> errorProperties) {
+
+		var code = exception.getErrorCode();
+
+	    errorProperties.put("status", code.getStatus());
+	    errorProperties.put("code", code.getCode());
+	    errorProperties.put("error", "Ошибка.");
+	    errorProperties.put("listErrors", exception.getMessage());
+	    
+	    return ServerResponse
+	        .status(code.getStatus())
+	        .contentType(MediaType.APPLICATION_JSON)
+	        .body(BodyInserters.fromValue(errorProperties));
+	}
+	
+	private Mono<ServerResponse> renderDefault(
+			Throwable throwable,
+			ServerRequest request,
+			Map<String, Object> errorProperties) {
+
+		var code = ErrorCode.UNEXPECTED;
+
+	    errorProperties.put("status", code.getStatus());
+	    errorProperties.put("code", code.getCode());
+	    errorProperties.put("error", "Непредвиденная ошибка.");
+	    errorProperties.put("listErrors", throwable.getMessage());
+	    
+	    return ServerResponse
+	        .status(code.getStatus())
+	        .contentType(MediaType.APPLICATION_JSON)
+	        .body(BodyInserters.fromValue(errorProperties));
 	}
 }

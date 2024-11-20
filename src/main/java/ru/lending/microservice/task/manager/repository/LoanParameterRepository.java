@@ -19,4 +19,6 @@ public interface LoanParameterRepository  extends ReactiveCrudRepository<LoanPar
 	 */
 	@Query("SELECT t.* FROM tsk.tasks_loan_parameters t where t.task_id=:taskId")
 	Mono<LoanParameter> findByTaskId(Long taskId);
+
+	Mono<LoanParameter> findByLoanParameterId(Long loanParameterId);
 }

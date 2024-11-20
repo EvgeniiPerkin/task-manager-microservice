@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,13 +24,24 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain = true)
 @Builder
+@Schema(
+	description = "Структура данных приоритета задач.", 
+	title = "Priority", 
+	example = """
+		{
+		  "id": "1",
+		  "description": "Высокий"
+		}"""
+)
 public class Priority {
     /**Идентификатор.*/
+	@Schema(description = "Идентификатор приоритета.", example = "1")
     @Id
     @Column("id")
     private Long id;
 
     /**Описание.*/
+	@Schema(description = "Описание приоритета.", example = "Высокий")
     @Column("description")
     private String description;
 }

@@ -1,31 +1,28 @@
 package ru.lending.microservice.task.manager.exception;
 
+import org.springframework.http.HttpStatus;
+
 public enum ErrorCode {
-	GENERIC_ERROR("E0001", "Системе не удается выполнить запрос. Обратитесь в службу поддержки системы."),
-	HTTP_MEDIATYPE_NOT_SUPPORTED("E0002", "Запрашиваемый медиа-тип не поддерживается. Пожалуйста, используйте application/json в качестве значения заголовка Content-Type"),
-	HTTP_MESSAGE_NOT_WRITABLE("E0003", "Отсутствует заголовок 'Accept'. Пожалуйста, добавьте заголовок 'Accept'."),
-	HTTP_MEDIA_TYPE_NOT_ACCEPTABLE("E0004", "Запрошенное значение заголовка 'Accept' не поддерживается. Пожалуйста, используйте application/json в качестве значения 'Accept'."),
-	JSON_PARSE_ERROR("E0005", "Убедитесь, что полезная нагрузка запроса должна быть допустимым объектом JSON."),
-	HTTP_MESSAGE_NOT_READABLE("E0006", "Убедитесь, что полезная нагрузка запроса должна быть допустимым объектом JSON в соответствии с 'Content-Type'."),
-	HTTP_REQUEST_METHOD_NOT_SUPPORTED("E0007", "Метод запроса не поддерживается."),
-	CONSTRAINT_VIOLATION("E0008", "Ошибка валидации данных."),
-	ILLEGAL_ARGUMENT_EXCEPTION("E0009", "Переданы недопустимые данные."),
-	RESOURCE_NOT_FOUND("E0010", "Запрошенный ресурс не найден."),
-	GENERIC_ALREADY_EXISTS("E0011", "Уже существует.");
+	FORBIDDEN(403, HttpStatus.FORBIDDEN),
+	NOT_FOUND(404, HttpStatus.NOT_FOUND),
+	UNEXPECTED(5000, HttpStatus.INTERNAL_SERVER_ERROR),
+	VALIDATION_FAIL(4000, HttpStatus.BAD_REQUEST),
+	FILE_UPLOAD_EXCEPTION(4001, HttpStatus.INTERNAL_SERVER_ERROR),
+	ALREADY_EXISTS(4002, HttpStatus.CONFLICT);
 	
-	private String code;
-	private String key;
+	private final Integer code;
+	private final HttpStatus status;
 	
-	private ErrorCode(final String code, final String key) {
+	private ErrorCode(int code, HttpStatus status) {
 		this.code = code;
-		this.key = key;
+		this.status = status;
 	}
 	
-	public String getCode() {
+	public Integer getCode() {
 	    return code;
 	}
 
-	public String getKey() {
-	    return key;
+	public HttpStatus getStatus() {
+	    return status;
 	}
 }

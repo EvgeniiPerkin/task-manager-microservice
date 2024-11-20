@@ -1,5 +1,6 @@
 package ru.lending.microservice.task.manager.servce;
 
+import jakarta.validation.Valid;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.lending.microservice.task.manager.entity.Theme;
@@ -11,10 +12,10 @@ import ru.lending.microservice.task.manager.entity.dto.ThemeDto;
 public interface ThemeService {
 	/**
 	 * Создает новую тему задачи
-	 * @param themeDto Набор данных для создания темы задачи
+	 * @param t Набор данных для создания темы задачи
 	 * @return Созданная тема задачи
 	 */
-	Mono<Theme> create(ThemeDto themeDto);
+	Mono<Theme> create(@Valid Mono<ThemeDto> t);
 	/**
 	 * Поиск темы задачи по идентификатор отдела
 	 * @param id идентификатор отдела
@@ -35,8 +36,8 @@ public interface ThemeService {
 	Mono<Void> deleteById(Long id);
 	/**
 	 * Изменяет данные темы задачи
-	 * @param theme Тама задачи
+	 * @param t Тама задачи
 	 * @return Измененная тема задачи
 	 */
-	Mono<Theme> update(Theme theme);
+	Mono<Theme> update(@Valid Mono<Theme> t);
 }

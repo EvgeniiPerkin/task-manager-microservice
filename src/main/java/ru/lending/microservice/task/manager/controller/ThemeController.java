@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,12 +28,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.lending.microservice.task.manager.entity.Theme;
 import ru.lending.microservice.task.manager.entity.dto.ThemeDto;
-import ru.lending.microservice.task.manager.mapper.ThemeMapper;
-import ru.lending.microservice.task.manager.response.ThemeResponse;
+import ru.lending.microservice.task.manager.exception.NotFoundException;
 import ru.lending.microservice.task.manager.servce.ThemeService;
 
 @Tag(name = "Темы задач.", description = "Запросы к конроллеру тем задач.")
-@RequestMapping("/api/v1/themes")
+@RequestMapping(value ="/api/v1/themes", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class ThemeController {
 	@Autowired
@@ -43,36 +43,50 @@ public class ThemeController {
     @Operation(summary = "Поиск темы по идентификатору отдела.")
 	@GetMapping("/{id}")
     Mono<ResponseEntity<Flux<Theme>>> findByDepartmentId(@Parameter(description = "Идентификатор отдела.") @PathVariable Long id) {
-    	LOGGER.info("Поиск темы по идентификатору отдела: {}", id);
+    	LOGGER.info("Поиск темы по идентификатору отдела: {}.", id);
 		return Mono.just(ok(themeService.findByDepartmentId(id)));
 	}
 
     @Operation(summary = "Создание новой темы.")
 	@PostMapping
-    Mono<ResponseEntity<ThemeResponse>> create(@Parameter(description = "Данные для создания темы.") @Valid @RequestBody ThemeDto theme) {
-    	LOGGER.info("Создание новой темы {}, для отдела (идентификатор): {}", theme.description(),theme.departmentId());
-    	return themeService.create(theme)
-			.map(savedTheme -> ResponseEntity.status(HttpStatus.CREATED).body(savedTheme))
-			.onErrorResume(WebExchangeBindException.class,
-					ex -> Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(ThemeMapper.fromWebExchangeBindException(ex))));
+    Mono<ResponseEntity<Theme>> create(@Parameter(description = "Данные для создания темы.") @Valid @RequestBody Mono<ThemeDto> theme) {
+        return themeService.create(theme)
+        		.map(savedTheme -> ResponseEntity.status(HttpStatus.CREATED).body(savedTheme))
+        		.doOnNext(t -> {
+        			LOGGER.info("Создание новой темы '{}', для отдела (идентификатор): '{}'.",
+        					t.getBody().getDescription(),
+        					t.getBody().getDepartmentId());
+        		});
 	}
 	
     @PutMapping("/{id}")
     @Operation(summary = "Обновление/изменение темы.")
-    Mono<ResponseEntity<Theme>> update(@Parameter(description = "Данные темы для ее изменения.") @RequestBody Theme theme) {  
-    	LOGGER.info("Изменение темы, идентификатор: {}", theme.getId());    
-    	return themeService.update(theme)
-            .map(savedTheme -> ResponseEntity.status(HttpStatus.NO_CONTENT).body(savedTheme));
+    Mono<ResponseEntity<Theme>> update(@Parameter(description = "Данные темы для ее изменения.") @Valid @RequestBody Mono<Theme> theme) {
+    	Mono<Theme> mono = theme.cache();
+    	return validate(mono)
+			.flatMap(t -> themeService.update(mono)
+	        	.doOnNext(l -> {
+	        		LOGGER.info("Изменение темы, идентификатор: {}.", l.getId()); 
+	        	})
+				.map(savedTheme -> ResponseEntity.status(HttpStatus.NO_CONTENT).body(savedTheme)));
+    }
+    
+    private Mono<Theme> validate(Mono<Theme> theme) {
+        return theme
+        	.doOnNext(l -> {
+        		LOGGER.info("Поиск темы для ее изменения, идентификатор: {}.", l.getId()); 
+        	})
+        	.flatMap(t -> themeService.findById(t.getId()))
+    		.switchIfEmpty(Mono.error(new NotFoundException("Измение темы задачи. Тема не найдена.")));
     }
 
     @Operation(summary = "Удаление темы по ее идентификатору.")
 	@DeleteMapping("/{id}")
     Mono<ResponseEntity<Void>> deleteById(@Parameter(description = "Идентификатор темы.") @PathVariable Long id) {
-    	LOGGER.info("Удаление темы по ее идентификатору: {}", id);
+    	LOGGER.info("Удаление темы по ее идентификатору: {}.", id);
 		return themeService.findById(id)
 			.flatMap(t -> themeService.deleteById(t.getId())
 				.then(Mono.just(status(HttpStatus.ACCEPTED).<Void>build())))
-            .switchIfEmpty(Mono.just(notFound().build()));
+            .switchIfEmpty(Mono.error(new NotFoundException("Удаление темы задачи. Тема не найдена.")));
 	}
 }

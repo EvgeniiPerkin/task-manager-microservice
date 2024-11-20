@@ -1,5 +1,6 @@
 package ru.lending.microservice.task.manager.exception;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.springframework.boot.web.error.ErrorAttributeOptions;
@@ -15,17 +16,18 @@ import lombok.Setter;
 @Setter
 @Component
 public class ApiErrorAttributes extends DefaultErrorAttributes {
-
-	private HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-	private String message = ErrorCode.GENERIC_ERROR.getKey();
-	  
 	@Override
 	public Map<String, Object> getErrorAttributes(ServerRequest request,
 	    ErrorAttributeOptions options) {
+		
+		ArrayList<String> errors = new ArrayList<String>();
+		errors.add("Описание ошибки 1");
+		errors.add("Описание ошибки 2");
+		
 	    var attributes = super.getErrorAttributes(request, options);
-	    attributes.put("status", status);
-	    attributes.put("message", message);
-	    attributes.put("code", ErrorCode.GENERIC_ERROR.getCode());
+	    attributes.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
+	    attributes.put("code", ErrorCode.UNEXPECTED.getCode());
+	    attributes.put("listErrors", errors);
 	    return attributes;
 	}
 }
