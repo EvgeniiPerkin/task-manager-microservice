@@ -7,11 +7,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;
 import ru.lending.microservice.task.manager.entity.Task;
 import ru.lending.microservice.task.manager.entity.ViewTask;
+import ru.lending.microservice.task.manager.entity.dto.FilterTaskDto;
 import ru.lending.microservice.task.manager.entity.dto.TaskDto;
-import ru.lending.microservice.task.manager.entity.dto.ViewTaskDto;
 import ru.lending.microservice.task.manager.repository.ClientRepository;
 import ru.lending.microservice.task.manager.repository.CollateralRepository;
 import ru.lending.microservice.task.manager.repository.ConditionRepository;
@@ -73,25 +74,27 @@ public class TaskServiceImpl implements TaskService {
 	}
 
 	@Override
-	public Mono<Task> create(TaskDto dto) {
-		Task t = Task.builder()
-				.createdAt(dto.createdAt())
-				.themeId(dto.themeId())
-				.priorityId(dto.priorityId())
-				.conditionId(dto.conditionId())
-				.fromDepartmentId(dto.fromDepartmentId())
-				.fromEmployeeId(dto.fromEmployeeId())
-				.toDepartmentId(dto.toDepartmentId())
-				.toEmployeeId(dto.toEmployeeId())
-				.title(dto.title())
-				.content(dto.content())
-				.plannedStartDateTime(dto.plannedStartDateTime())
-				.plannedEndDateTime(dto.plannedEndDateTime())
-				.actualStartDateTime(dto.actualStartDateTime())
-				.actualEndDateTime(dto.actualEndDateTime())
+	public Mono<Task> create(@Valid Mono<TaskDto> dto) {
+		return dto
+			.flatMap(d -> {
+				Task t = Task.builder()
+				.createdAt(d.createdAt())
+				.themeId(d.themeId())
+				.priorityId(d.priorityId())
+				.conditionId(d.conditionId())
+				.fromDepartmentId(d.fromDepartmentId())
+				.fromEmployeeId(d.fromEmployeeId())
+				.toDepartmentId(d.toDepartmentId())
+				.toEmployeeId(d.toEmployeeId())
+				.title(d.title())
+				.content(d.content())
+				.plannedStartDateTime(d.plannedStartDateTime())
+				.plannedEndDateTime(d.plannedEndDateTime())
+				.actualStartDateTime(null)
+				.actualEndDateTime(null)
 				.build();
-		
-		return taskRepository.save(t);
+				return taskRepository.save(t);
+			});
 	}
 
 	@Override
@@ -100,7 +103,7 @@ public class TaskServiceImpl implements TaskService {
 	}
 	
 	@Override
-	public Mono<Page<ViewTask>> findByFilterAndPagination(PageRequest pr, ViewTaskDto dto) {		
+	public Mono<Page<ViewTask>> findByFilterAndPagination(PageRequest pr, FilterTaskDto dto) {		
 		Example<ViewTask> example = Example.of(ViewTask.builder()
 				.id(null)
 				.createdAt(null)

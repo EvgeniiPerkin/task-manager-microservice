@@ -23,7 +23,7 @@ import ru.lending.microservice.task.manager.entity.Condition;
 import ru.lending.microservice.task.manager.servce.ReadService;
 
 @Tag(name = "Состояния задач.", description = "Запросы к конроллеру состояний задач.")
-@RequestMapping("/api/v1/conditions")
+@RequestMapping(value = "/api/v1/conditions", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class ConditionController {
 	@Autowired

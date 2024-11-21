@@ -11,5 +11,9 @@ public abstract class CustomBaseException extends RuntimeException {
 		super(message);
 	}
 	
+	protected CustomBaseException(Throwable cause) {
+	    super(cause);
+	}
+	
 	public abstract ErrorCode getErrorCode();
 }

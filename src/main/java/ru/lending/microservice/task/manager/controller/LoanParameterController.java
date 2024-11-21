@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -21,8 +20,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;
+import ru.lending.microservice.task.manager.exception.Error;
 import ru.lending.microservice.task.manager.entity.LoanParameter;
-import ru.lending.microservice.task.manager.exception.NotFoundException;
 import ru.lending.microservice.task.manager.servce.LoanParameterService;
 
 @Tag(name = "Парметры кредита.", description = "Запросы к конроллеру параметров кредита.")
@@ -34,7 +33,8 @@ public class LoanParameterController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoanParameterController.class);
 
-    @Operation(summary = "Создание параметров кредита.",
+    @Operation(
+    	summary = "Создание параметров кредита.",
     	responses = {
 			@ApiResponse(
 				responseCode = "201",
@@ -52,28 +52,28 @@ public class LoanParameterController {
 				)
 			),
             @ApiResponse(
-        		responseCode = "404",
-              	description = "Не удается найти параметры кредита по заданным параметрам.",
+        		responseCode = "409",
+              	description = "Не удается создать запись по заданным параметрам, т.к. запись уже существует.",
               	content = @Content(
           			mediaType = MediaType.APPLICATION_JSON_VALUE,
-          			schema = @Schema(implementation = String.class),
-          			examples = {@ExampleObject(value = "Параметры кредита не найдены.")}
+					array = @ArraySchema(
+						schema = @Schema(
+							name = "Error",
+							implementation = Error.class
+						)
+					)
     		  	)
             )
     	}
     )
 	@PostMapping
     Mono<ResponseEntity<LoanParameter>> create(
-    		@Parameter(description = "Параметры кредита.")
-    		@Valid
-    		@RequestBody
-    		Mono<LoanParameter> lp) {
-    	//LOGGER.info("Создание параметров кредита, идентификатор парметров: {}, идентификатор задачи: {}.", lp.getLoanParameterId(), lp.getTaskId());
-    	return lp
-    		.flatMap(l -> service.create(lp))
-    		.doOnNext(l -> {
-        		LOGGER.info("Создание записи параметров кредта, идентификатор: {}.", l.getLoanParameterId()); 
-        	})
+		@Parameter(description = "Параметры кредита.")
+		@Valid
+		@RequestBody Mono<LoanParameter> lp) {
+    	return service.create(lp)
+    		.doOnNext(l -> LOGGER.info("Создание параметров кредита, идентификатор парметров: {}, идентификатор задачи: {}.",
+				l.getLoanParameterId(), l.getTaskId()))
     		.map(savedLP -> ResponseEntity.status(HttpStatus.CREATED).body(savedLP));
 	}
 }

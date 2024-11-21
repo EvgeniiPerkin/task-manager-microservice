@@ -24,17 +24,16 @@ public class LoanParameterServiceImpl implements LoanParameterService {
 	private CollateralRepository collateralRepository;
 
 	@Override
-    @Transactional
+    //@Transactional
 	public Mono<LoanParameter> create(@Valid Mono<LoanParameter> lp) {
-        return lp.flatMap(l -> {
-    		return lpRepository.save(l)
+        return lp.flatMap(l -> lpRepository.save(l)
 	            .flatMap(savedItem -> 
 	            	clientRepository.saveAll(l.getClients()).collectList()
 	            	.then(Mono.just(savedItem)))
 	            .flatMap(savedItem -> 
 	            	collateralRepository.saveAll(l.getCollaterals()).collectList()
-	            	.then(Mono.just(savedItem)));
-        });
+	            	.then(Mono.just(savedItem)))
+        );
 	}
 
 	@Override

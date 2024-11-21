@@ -10,6 +10,7 @@ import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
@@ -51,6 +52,10 @@ public class ApiErrorWebExceptionHandler extends AbstractErrorWebExceptionHandle
 			return render((WebExchangeBindException) throwable, request, errorProperties);
 	    }
 		
+		if (throwable instanceof DuplicateKeyException) {
+			return render((DuplicateKeyException) throwable, request, errorProperties);
+		}
+		
 		if (throwable instanceof CustomBaseException) {
 			return render((CustomBaseException) throwable, request, errorProperties);
 		}
@@ -80,6 +85,24 @@ public class ApiErrorWebExceptionHandler extends AbstractErrorWebExceptionHandle
 	        .contentType(MediaType.APPLICATION_JSON)
 	        .body(BodyInserters.fromValue(errorProperties));
 	}
+
+	private Mono<ServerResponse> render(
+			DuplicateKeyException throwable,
+			ServerRequest request,
+			Map<String, Object> errorProperties) {
+
+		var code = ErrorCode.ALREADY_EXISTS;
+
+	    errorProperties.put("status", code);
+	    errorProperties.put("code", code.getCode());
+	    errorProperties.put("error", "Значения уже есть в базе данных.");
+	    errorProperties.put("listErrors", throwable.getMessage());
+	    
+	    return ServerResponse
+	        .status(code.getStatus())
+	        .contentType(MediaType.APPLICATION_JSON)
+	        .body(BodyInserters.fromValue(errorProperties));
+	}
 	
 	private Mono<ServerResponse> render(
 			CustomBaseException exception,
@@ -88,7 +111,7 @@ public class ApiErrorWebExceptionHandler extends AbstractErrorWebExceptionHandle
 
 		var code = exception.getErrorCode();
 
-	    errorProperties.put("status", code.getStatus());
+	    errorProperties.put("status", code);
 	    errorProperties.put("code", code.getCode());
 	    errorProperties.put("error", "Ошибка.");
 	    errorProperties.put("listErrors", exception.getMessage());
