@@ -9,13 +9,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @Component
 public class ApiErrorAttributes extends DefaultErrorAttributes {
+	public ApiErrorAttributes() {
+        super();
+    }
+	
 	@Override
 	public Map<String, Object> getErrorAttributes(ServerRequest request,
 	    ErrorAttributeOptions options) {

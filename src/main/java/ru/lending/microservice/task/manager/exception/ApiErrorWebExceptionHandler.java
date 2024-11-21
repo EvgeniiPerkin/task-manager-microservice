@@ -11,7 +11,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,7 @@ import reactor.core.publisher.Mono;
 @Component
 @Order(-2)
 public class ApiErrorWebExceptionHandler extends AbstractErrorWebExceptionHandler {
-	public ApiErrorWebExceptionHandler(ApiErrorAttributes errorAttributes,
+	public ApiErrorWebExceptionHandler(ErrorAttributes errorAttributes,
 		    ApplicationContext applicationContext,
 		    ServerCodecConfigurer serverCodecConfigurer) {
 		super(errorAttributes, new WebProperties().getResources(), applicationContext);
