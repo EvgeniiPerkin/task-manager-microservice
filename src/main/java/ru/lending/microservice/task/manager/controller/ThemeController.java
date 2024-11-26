@@ -1,14 +1,13 @@
 package ru.lending.microservice.task.manager.controller;
 
-import static org.springframework.http.ResponseEntity.ok;
-import static org.springframework.http.ResponseEntity.status;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +40,7 @@ import ru.lending.microservice.task.manager.servce.ThemeService;
 public class ThemeController {
 	@Autowired
 	private ThemeService themeService;
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThemeController.class);
 
     @Operation(
@@ -89,11 +88,11 @@ public class ThemeController {
 	@PostMapping
     Mono<ResponseEntity<Theme>> create(@Parameter(description = "Данные для создания темы.") @Valid @RequestBody Mono<ThemeDto> theme) {
         return themeService.create(theme)
-    		.map(savedTheme -> ResponseEntity.status(HttpStatus.CREATED).body(savedTheme))
-    		.doOnNext(t -> {
-    			LOGGER.info("Создание новой темы '{}', для отдела (идентификатор): '{}'.",
-					t.getBody().getDescription(),
-					t.getBody().getDepartmentId());
+    			.map(savedTheme -> ResponseEntity.status(HttpStatus.CREATED).body(savedTheme))
+    		 	.doOnNext(t -> {
+    		 	LOGGER.info("Создание новой темы '{}', для отдела (идентификатор): '{}'.",
+				 	t.getBody().getDescription(),
+				 	t.getBody().getDepartmentId());
 		});
 	}
 	
