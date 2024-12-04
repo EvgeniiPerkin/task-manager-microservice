@@ -10,11 +10,11 @@ import ru.lending.microservice.task.manager.servce.ReadService;
 
 @Service
 public class PriorityServiceImpl implements ReadService<Priority>{
-	@Autowired
-	private PriorityRepository repository;
+  @Autowired
+  private PriorityRepository repository;
 
-	@Override
-	public Flux<Priority> getAll() {
-		return repository.findAll();
-	}
+  @Override
+  public Flux<Priority> getAll() {
+    return repository.findAll();
+  }
 }

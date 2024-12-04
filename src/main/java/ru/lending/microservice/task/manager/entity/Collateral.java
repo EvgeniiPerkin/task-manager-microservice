@@ -23,15 +23,15 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Builder
 public class Collateral {
-    /**Идентификатор клиента.*/
-    @Column("collateral_id")
-    private Long collateralId;
+  /**Идентификатор клиента.*/
+  @Column("collateral_id")
+  private Long collateralId;
 
-    /**Идентификатор парметров кредита.*/
-    @Column("loan_parameter_id")
-    private Long loanParameterId;
+  /**Идентификатор парметров кредита.*/
+  @Column("loan_parameter_id")
+  private Long loanParameterId;
 
-    /**Идентификатор задачи.*/
-    @Column("task_id")
-    private Long taskId;
+  /**Идентификатор задачи.*/
+  @Column("task_id")
+  private Long taskId;
 }

@@ -12,12 +12,12 @@ import ru.lending.microservice.task.manager.entity.Collateral;
  */
 @Repository
 public interface CollateralRepository extends ReactiveCrudRepository<Collateral, Long> {
-	/**
-	 * Поиск данных обеспечений (идентификаторов обеспечений)
-	 * @param taskId Идентификатор задачи
-	 * @param loanParameterId Идентификатор пармаметров кредита
-	 * @return Список обеспечений
-	 */
-	@Query("SELECT t.* FROM tsk.loan_parameters_collaterals t where t.task_id=:taskId and t.loan_parameter_id=:loanParameterId")
-	Flux<Collateral> findByTaskIdAndLoanParameterId(Long taskId, Long loanParameterId);
+  /**
+   * Поиск данных обеспечений (идентификаторов обеспечений)
+   * @param taskId Идентификатор задачи
+   * @param loanParameterId Идентификатор пармаметров кредита
+   * @return Список обеспечений
+   */
+  @Query("SELECT t.* FROM tsk.loan_parameters_collaterals t where t.task_id=:taskId and t.loan_parameter_id=:loanParameterId")
+  Flux<Collateral> findByTaskIdAndLoanParameterId(Long taskId, Long loanParameterId);
 }

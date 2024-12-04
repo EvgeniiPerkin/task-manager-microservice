@@ -7,9 +7,9 @@ import reactor.core.publisher.Flux;
  * @param <T> entity
  */
 public interface ReadService<T> {
-	/**
-	 * Получение всех данных какой либо сущности
-	 * @return список сущностей
-	 */
-	Flux<T> getAll();
+  /**
+   * Получение всех данных какой либо сущности
+   * @return список сущностей
+   */
+  Flux<T> getAll();
 }

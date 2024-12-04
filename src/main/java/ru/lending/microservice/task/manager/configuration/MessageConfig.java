@@ -8,18 +8,18 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @Configuration
 public class MessageConfig {
-	@Bean
-    MessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasenames("classpath:messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        return messageSource;
-    }
+  @Bean
+  MessageSource messageSource() {
+    ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+    messageSource.setBasenames("classpath:messages");
+    messageSource.setDefaultEncoding("UTF-8");
+    return messageSource;
+  }
 
-    @Bean
-    LocalValidatorFactoryBean validatorFactoryBean(MessageSource messageSource) {
-        LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
-        localValidatorFactoryBean.setValidationMessageSource(messageSource);
-        return localValidatorFactoryBean;
-    }
+  @Bean
+  LocalValidatorFactoryBean validatorFactoryBean(MessageSource messageSource) {
+    LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+    localValidatorFactoryBean.setValidationMessageSource(messageSource);
+    return localValidatorFactoryBean;
+  }
 }

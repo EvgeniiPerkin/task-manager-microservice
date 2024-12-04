@@ -12,13 +12,13 @@ import ru.lending.microservice.task.manager.entity.LoanParameter;
  */
 @Repository
 public interface LoanParameterRepository  extends ReactiveCrudRepository<LoanParameter, Long> {
-	/**
-	 * Поиск данных параметров кредита
-	 * @param taskId Идентификатор задачи
-	 * @return Параметры кредита
-	 */
-	@Query("SELECT t.* FROM tsk.tasks_loan_parameters t where t.task_id=:taskId")
-	Mono<LoanParameter> findByTaskId(Long taskId);
+  /**
+   * Поиск данных параметров кредита
+   * @param taskId Идентификатор задачи
+   * @return Параметры кредита
+   */
+  @Query("SELECT t.* FROM tsk.tasks_loan_parameters t where t.task_id=:taskId")
+  Mono<LoanParameter> findByTaskId(Long taskId);
 
-	Mono<LoanParameter> findByLoanParameterId(Long loanParameterId);
+  Mono<LoanParameter> findByLoanParameterId(Long loanParameterId);
 }

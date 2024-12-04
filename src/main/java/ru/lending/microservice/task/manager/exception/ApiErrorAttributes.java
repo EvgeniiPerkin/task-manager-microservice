@@ -11,22 +11,22 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 
 @Component
 public class ApiErrorAttributes extends DefaultErrorAttributes {
-	public ApiErrorAttributes() {
-        super();
-    }
-	
-	@Override
-	public Map<String, Object> getErrorAttributes(ServerRequest request,
-	    ErrorAttributeOptions options) {
-		
-		ArrayList<String> errors = new ArrayList<>();
-		errors.add("Описание ошибки 1");
-		errors.add("Описание ошибки 2");
-		
-	    var attributes = super.getErrorAttributes(request, options);
-	    attributes.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
-	    attributes.put("code", ErrorCode.UNEXPECTED.getCode());
-	    attributes.put("listErrors", errors);
-	    return attributes;
-	}
+  public ApiErrorAttributes() {
+    super();
+  }
+
+  @Override
+  public Map<String, Object> getErrorAttributes(ServerRequest request,
+    ErrorAttributeOptions options) {
+
+    ArrayList<String> errors = new ArrayList<>();
+    errors.add("Описание ошибки 1");
+    errors.add("Описание ошибки 2");
+
+    var attributes = super.getErrorAttributes(request, options);
+    attributes.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
+    attributes.put("code", ErrorCode.UNEXPECTED.getCode());
+    attributes.put("listErrors", errors);
+    return attributes;
+  }
 }

@@ -12,11 +12,11 @@ import ru.lending.microservice.task.manager.entity.Theme;
  */
 @Repository
 public interface ThemeRepository extends ReactiveCrudRepository<Theme, Long> {
-    /**
-     * Поиск данных тем задач
-     * @param id Идентификатор отдела
-     * @return Список тем задач на конкретный отдел
-     */
-	@Query("SELECT t.* FROM tsk.themes t where t.department_id=:id")
-	Flux<Theme> findByDepartmentId(Long id);
+  /**
+   * Поиск данных тем задач
+   * @param id Идентификатор отдела
+   * @return Список тем задач на конкретный отдел
+   */
+  @Query("SELECT t.* FROM tsk.themes t where t.department_id=:id")
+  Flux<Theme> findByDepartmentId(Long id);
 }

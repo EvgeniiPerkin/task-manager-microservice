@@ -25,23 +25,23 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(
-	description = "Структура данных состояния задач.", 
-	title = "Condition", 
-	example = """
-		{
-		  "id": "1",
-		  "description": "Отменена"
-		}"""
-)
+  description = "Структура данных состояния задач.", 
+  title = "Condition", 
+  example = """
+    {
+      "id": "1",
+      "description": "Отменена"
+    }"""
+  )
 public class Condition {
-    /**Идентификатор.*/
-	@Schema(description = "Идентификатор состояния.", example = "1")
-    @Id
-    @Column("id")
-    private Long id;
+  /**Идентификатор.*/
+  @Schema(description = "Идентификатор состояния.", example = "1")
+  @Id
+  @Column("id")
+  private Long id;
 
-    /**Описание.*/
-	@Schema(description = "Описание состояния.", example = "В работе")
-    @Column("description")
-    private String description;
+  /**Описание.*/
+  @Schema(description = "Описание состояния.", example = "В работе")
+  @Column("description")
+  private String description;
 }

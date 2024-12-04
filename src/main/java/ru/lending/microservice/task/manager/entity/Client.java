@@ -23,15 +23,15 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Builder
 public class Client {
-    /**Идентификатор клиента.*/
-    @Column("client_id")
-    private Long clientId;
+  /**Идентификатор клиента.*/
+  @Column("client_id")
+  private Long clientId;
 
-    /**Идентификатор парметров кредита.*/
-    @Column("loan_parameter_id")
-    private Long loanParameterId;
+  /**Идентификатор парметров кредита.*/
+  @Column("loan_parameter_id")
+  private Long loanParameterId;
 
-    /**Идентификатор задачи.*/
-    @Column("task_id")
-    private Long taskId;
+  /**Идентификатор задачи.*/
+  @Column("task_id")
+  private Long taskId;
 }

@@ -8,17 +8,17 @@ import ru.lending.microservice.task.manager.entity.LoanParameter;
  * Сервис обработки данных параметров кредита
  */
 public interface LoanParameterService {
-	/**
-	 * Создает запись в бд параметров кредита
-	 * @param lp параметры кредита
-	 * @return Созданная запись параметров кредита
-	 */
-	Mono<LoanParameter> create(@Valid Mono<LoanParameter> lp);
+  /**
+   * Создает запись в бд параметров кредита
+   * @param lp параметры кредита
+   * @return Созданная запись параметров кредита
+   */
+  Mono<LoanParameter> create(@Valid Mono<LoanParameter> lp);
 
-	/**
-	 * поиск параметров кредита по идентификатору
-	 * @param loanParameterId идентификатор параметров кредита
-	 * @return параметры кредита
-	 */
-	Mono<LoanParameter> findByLoanParameterId(Long loanParameterId);
+  /**
+   * поиск параметров кредита по идентификатору
+   * @param loanParameterId идентификатор параметров кредита
+   * @return параметры кредита
+   */
+  Mono<LoanParameter> findByLoanParameterId(Long loanParameterId);
 }

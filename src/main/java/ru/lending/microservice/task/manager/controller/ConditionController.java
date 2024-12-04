@@ -26,32 +26,31 @@ import ru.lending.microservice.task.manager.servce.ReadService;
 @RequestMapping(value = "/api/v1/conditions", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class ConditionController {
-	@Autowired
-	private ReadService<Condition> service;
+  @Autowired
+  private ReadService<Condition> service;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ConditionController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConditionController.class);
 
-    @Operation(
-		summary = "Получение всех состояний задач.",
-    	responses = {
-			@ApiResponse(
-				responseCode = "200",
-				description = "Возвращает список состояний задач.",
-				content = @Content(
-					mediaType = MediaType.APPLICATION_JSON_VALUE,
-					array = @ArraySchema(
-						schema = @Schema(
-							name = "Condition",
-							implementation = Condition.class
-						)
-					)
-				)
-			)
-    	}
-	)
-	@GetMapping
-	Mono<ResponseEntity<Flux<Condition>>> getAll() {
-		LOGGER.info("Получение всех состояний задач.");
-		return Mono.just(ok(service.getAll()));
-	}
+  @Operation(
+    summary = "Получение всех состояний задач.",
+    responses = {
+      @ApiResponse(
+        responseCode = "200",
+        description = "Возвращает список состояний задач.",
+        content = @Content(
+          mediaType = MediaType.APPLICATION_JSON_VALUE,
+          array = @ArraySchema(
+            schema = @Schema(
+              name = "Condition",
+              implementation = Condition.class
+              )
+            )
+          )
+        )
+    })
+  @GetMapping
+  Mono<ResponseEntity<Flux<Condition>>> getAll() {
+    LOGGER.info("Получение всех состояний задач.");
+    return Mono.just(ok(service.getAll()));
+  }
 }

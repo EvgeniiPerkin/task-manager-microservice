@@ -10,26 +10,26 @@ import jakarta.validation.constraints.Size;
  * Содержит набор полей для создания темы задачи
  */
 @Schema(
-	description = "Модель темы задачи.",
-	title = "Theme",
-	example = """
-		{
-		    "departmentId": 1,
-		    "description": "Индикативная оценка недвижимости."
-		}"""
-)
+  description = "Модель темы задачи.",
+  title = "Theme",
+  example = """
+    {
+        "departmentId": 1,
+        "description": "Индикативная оценка недвижимости."
+    }"""
+  )
 public record ThemeDto(
-	/**
-	 * Идентификатор отдела
-	 */
-    @Schema(description = "Идентификатор отдела.", example = "1")
-	@NotNull(message = "{department.not.null}")
-	Long departmentId,
-	/**
-	 * Описание
-	 */
-    @Schema(description = "Описание.", example = "Индикативная оценка недвижимости.")
-	@NotBlank(message = "{description.not.blank}")
-	@Size(message = "{description.size}", min = 1, max = 255)
-	String description
-	) {}
+  /**
+   * Идентификатор отдела
+   */
+  @Schema(description = "Идентификатор отдела.", example = "1")
+  @NotNull(message = "{department.not.null}")
+  Long departmentId,
+  /**
+   * Описание
+   */
+  @Schema(description = "Описание.", example = "Индикативная оценка недвижимости.")
+  @NotBlank(message = "{description.not.blank}")
+  @Size(message = "{description.size}", min = 1, max = 255)
+  String description
+  ) {}

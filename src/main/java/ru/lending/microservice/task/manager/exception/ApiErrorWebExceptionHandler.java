@@ -27,115 +27,115 @@ import reactor.core.publisher.Mono;
 @Component
 @Order(-2)
 public class ApiErrorWebExceptionHandler extends AbstractErrorWebExceptionHandler {
-	public ApiErrorWebExceptionHandler(ErrorAttributes errorAttributes,
-		    ApplicationContext applicationContext,
-		    ServerCodecConfigurer serverCodecConfigurer) {
-		super(errorAttributes, new WebProperties().getResources(), applicationContext);
-		super.setMessageWriters(serverCodecConfigurer.getWriters());
-		super.setMessageReaders(serverCodecConfigurer.getReaders());
-	}
-	
-	@Override
-	protected RouterFunction<ServerResponse> getRoutingFunction(ErrorAttributes errorAttributes) {
-		return RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse);
-	}
-	
-	private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
-	    Map<String, Object> errorProperties = getErrorAttributes(request, ErrorAttributeOptions.defaults());
-	    
-	    Throwable throwable = (Throwable) request
-		    .attribute("org.springframework.boot.web.reactive.error.DefaultErrorAttributes.ERROR")
-		    .orElseThrow(() -> new IllegalStateException("Missing exception attribute in ServerWebExchange"));
-		
-		if (throwable instanceof WebExchangeBindException) {
-			return render((WebExchangeBindException) throwable, request, errorProperties);
-	    }
-		
-		if (throwable instanceof DuplicateKeyException) {
-			return render((DuplicateKeyException) throwable, request, errorProperties);
-		}
-		
-		if (throwable instanceof CustomBaseException) {
-			return render((CustomBaseException) throwable, request, errorProperties);
-		}
-		
-		return renderDefault(throwable, request, errorProperties);
-	}
+  public ApiErrorWebExceptionHandler(ErrorAttributes errorAttributes,
+    ApplicationContext applicationContext,
+    ServerCodecConfigurer serverCodecConfigurer) {
+    super(errorAttributes, new WebProperties().getResources(), applicationContext);
+    super.setMessageWriters(serverCodecConfigurer.getWriters());
+    super.setMessageReaders(serverCodecConfigurer.getReaders());
+  }
 
-	private Mono<ServerResponse> render(
-			WebExchangeBindException exception,
-			ServerRequest request,
-			Map<String, Object> errorProperties) {
-    	
-		var errors = exception.getBindingResult()
-	      .getAllErrors()
-	      .stream()
-	      .map(DefaultMessageSourceResolvable::getDefaultMessage)
-	      .collect(Collectors.toList());
-		
-		var code = ErrorCode.VALIDATION_FAIL;
+  @Override
+  protected RouterFunction<ServerResponse> getRoutingFunction(ErrorAttributes errorAttributes) {
+    return RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse);
+  }
 
-	    errorProperties.put("status", code.getStatus());
-	    errorProperties.put("code", code.getCode());
-	    errorProperties.put("error", "Ошибка валидации данных.");
-	    errorProperties.put("listErrors", errors);
-	    return ServerResponse
-	        .status(code.getStatus())
-	        .contentType(MediaType.APPLICATION_JSON)
-	        .body(BodyInserters.fromValue(errorProperties));
-	}
+  private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
+    Map<String, Object> errorProperties = getErrorAttributes(request, ErrorAttributeOptions.defaults());
 
-	private Mono<ServerResponse> render(
-			DuplicateKeyException throwable,
-			ServerRequest request,
-			Map<String, Object> errorProperties) {
+    Throwable throwable = (Throwable) request
+      .attribute("org.springframework.boot.web.reactive.error.DefaultErrorAttributes.ERROR")
+      .orElseThrow(() -> new IllegalStateException("Missing exception attribute in ServerWebExchange"));
 
-		var code = ErrorCode.ALREADY_EXISTS;
+    if (throwable instanceof WebExchangeBindException) {
+      return render((WebExchangeBindException) throwable, request, errorProperties);
+    }
 
-	    errorProperties.put("status", code);
-	    errorProperties.put("code", code.getCode());
-	    errorProperties.put("error", "Значения уже есть в базе данных.");
-	    errorProperties.put("listErrors", throwable.getMessage());
-	    
-	    return ServerResponse
-	        .status(code.getStatus())
-	        .contentType(MediaType.APPLICATION_JSON)
-	        .body(BodyInserters.fromValue(errorProperties));
-	}
-	
-	private Mono<ServerResponse> render(
-			CustomBaseException exception,
-			ServerRequest request,
-			Map<String, Object> errorProperties) {
+    if (throwable instanceof DuplicateKeyException) {
+      return render((DuplicateKeyException) throwable, request, errorProperties);
+    }
 
-		var code = exception.getErrorCode();
+    if (throwable instanceof CustomBaseException) {
+      return render((CustomBaseException) throwable, request, errorProperties);
+    }
 
-	    errorProperties.put("status", code);
-	    errorProperties.put("code", code.getCode());
-	    errorProperties.put("error", "Ошибка.");
-	    errorProperties.put("listErrors", exception.getMessage());
-	    
-	    return ServerResponse
-	        .status(code.getStatus())
-	        .contentType(MediaType.APPLICATION_JSON)
-	        .body(BodyInserters.fromValue(errorProperties));
-	}
-	
-	private Mono<ServerResponse> renderDefault(
-			Throwable throwable,
-			ServerRequest request,
-			Map<String, Object> errorProperties) {
+    return renderDefault(throwable, request, errorProperties);
+  }
 
-		var code = ErrorCode.UNEXPECTED;
+  private Mono<ServerResponse> render(
+    WebExchangeBindException exception,
+    ServerRequest request,
+    Map<String, Object> errorProperties) {
 
-	    errorProperties.put("status", code.getStatus());
-	    errorProperties.put("code", code.getCode());
-	    errorProperties.put("error", "Непредвиденная ошибка.");
-	    errorProperties.put("listErrors", throwable.getMessage());
-	    
-	    return ServerResponse
-	        .status(code.getStatus())
-	        .contentType(MediaType.APPLICATION_JSON)
-	        .body(BodyInserters.fromValue(errorProperties));
-	}
+    var errors = exception.getBindingResult()
+      .getAllErrors()
+      .stream()
+      .map(DefaultMessageSourceResolvable::getDefaultMessage)
+      .collect(Collectors.toList());
+
+    var code = ErrorCode.VALIDATION_FAIL;
+
+    errorProperties.put("status", code.getStatus());
+    errorProperties.put("code", code.getCode());
+    errorProperties.put("error", "Ошибка валидации данных.");
+    errorProperties.put("listErrors", errors);
+    return ServerResponse
+      .status(code.getStatus())
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(BodyInserters.fromValue(errorProperties));
+  }
+
+  private Mono<ServerResponse> render(
+    DuplicateKeyException throwable,
+    ServerRequest request,
+    Map<String, Object> errorProperties) {
+
+    var code = ErrorCode.ALREADY_EXISTS;
+
+    errorProperties.put("status", code);
+    errorProperties.put("code", code.getCode());
+    errorProperties.put("error", "Значения уже есть в базе данных.");
+    errorProperties.put("listErrors", throwable.getMessage());
+
+    return ServerResponse
+      .status(code.getStatus())
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(BodyInserters.fromValue(errorProperties));
+  }
+
+  private Mono<ServerResponse> render(
+    CustomBaseException exception,
+    ServerRequest request,
+    Map<String, Object> errorProperties) {
+
+    var code = exception.getErrorCode();
+
+    errorProperties.put("status", code);
+    errorProperties.put("code", code.getCode());
+    errorProperties.put("error", "Ошибка.");
+    errorProperties.put("listErrors", exception.getMessage());
+
+    return ServerResponse
+      .status(code.getStatus())
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(BodyInserters.fromValue(errorProperties));
+  }
+
+  private Mono<ServerResponse> renderDefault(
+    Throwable throwable,
+    ServerRequest request,
+    Map<String, Object> errorProperties) {
+
+    var code = ErrorCode.UNEXPECTED;
+
+    errorProperties.put("status", code.getStatus());
+    errorProperties.put("code", code.getCode());
+    errorProperties.put("error", "Непредвиденная ошибка.");
+    errorProperties.put("listErrors", throwable.getMessage());
+
+    return ServerResponse
+      .status(code.getStatus())
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(BodyInserters.fromValue(errorProperties));
+  }
 }

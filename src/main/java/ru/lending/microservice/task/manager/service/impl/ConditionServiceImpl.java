@@ -10,11 +10,11 @@ import ru.lending.microservice.task.manager.servce.ReadService;
 
 @Service
 public class ConditionServiceImpl implements ReadService<Condition> {
-	@Autowired
-	private ConditionRepository repository;
+  @Autowired
+  private ConditionRepository repository;
 
-	@Override
-	public Flux<Condition> getAll() {
-		return repository.findAll();
-	}
+  @Override
+  public Flux<Condition> getAll() {
+    return repository.findAll();
+  }
 }

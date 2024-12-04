@@ -25,23 +25,23 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Builder
 @Schema(
-	description = "Структура данных приоритета задач.", 
-	title = "Priority", 
-	example = """
-		{
-		  "id": "1",
-		  "description": "Высокий"
-		}"""
-)
+  description = "Структура данных приоритета задач.", 
+  title = "Priority", 
+  example = """
+    {
+      "id": "1",
+      "description": "Высокий"
+    }"""
+  )
 public class Priority {
-    /**Идентификатор.*/
-	@Schema(description = "Идентификатор приоритета.", example = "1")
-    @Id
-    @Column("id")
-    private Long id;
+  /**Идентификатор.*/
+  @Schema(description = "Идентификатор приоритета.", example = "1")
+  @Id
+  @Column("id")
+  private Long id;
 
-    /**Описание.*/
-	@Schema(description = "Описание приоритета.", example = "Высокий")
-    @Column("description")
-    private String description;
+  /**Описание.*/
+  @Schema(description = "Описание приоритета.", example = "Высокий")
+  @Column("description")
+  private String description;
 }

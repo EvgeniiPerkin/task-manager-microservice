@@ -20,60 +20,60 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;
-import ru.lending.microservice.task.manager.exception.Error;
 import ru.lending.microservice.task.manager.entity.LoanParameter;
+import ru.lending.microservice.task.manager.exception.Error;
 import ru.lending.microservice.task.manager.servce.LoanParameterService;
 
 @Tag(name = "Парметры кредита.", description = "Запросы к конроллеру параметров кредита.")
 @RequestMapping(value = "/api/v1/lp", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class LoanParameterController {
-	@Autowired
-	private LoanParameterService service;
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(LoanParameterController.class);
+  @Autowired
+  private LoanParameterService service;
 
-    @Operation(
-    	summary = "Создание параметров кредита.",
-    	responses = {
-			@ApiResponse(
-				responseCode = "201",
-				description = "Возвращает параметры кредита (идентификатор параметров"
-						+ "кредита и связанные с ним "
-						+ "идентификаторы клиентов и идентификаторы обеспечений).",
-				content = @Content(
-					mediaType = MediaType.APPLICATION_JSON_VALUE,
-					array = @ArraySchema(
-						schema = @Schema(
-							name = "LoanParameter",
-							implementation = LoanParameter.class
-						)
-					)
-				)
-			),
-            @ApiResponse(
-        		responseCode = "409",
-              	description = "Не удается создать запись по заданным параметрам, т.к. запись уже существует.",
-              	content = @Content(
-          			mediaType = MediaType.APPLICATION_JSON_VALUE,
-					array = @ArraySchema(
-						schema = @Schema(
-							name = "Error",
-							implementation = Error.class
-						)
-					)
-    		  	)
+  private static final Logger LOGGER = LoggerFactory.getLogger(LoanParameterController.class);
+
+  @Operation(
+    summary = "Создание параметров кредита.",
+    responses = {
+      @ApiResponse(
+        responseCode = "201",
+        description = "Возвращает параметры кредита (идентификатор параметров"
+          + "кредита и связанные с ним "
+          + "идентификаторы клиентов и идентификаторы обеспечений).",
+          content = @Content(
+            mediaType = MediaType.APPLICATION_JSON_VALUE,
+            array = @ArraySchema(
+              schema = @Schema(
+                name = "LoanParameter",
+                implementation = LoanParameter.class
+              )
             )
-    	}
-    )
-	@PostMapping
-    Mono<ResponseEntity<LoanParameter>> create(
-		@Parameter(description = "Параметры кредита.")
-		@Valid
-		@RequestBody Mono<LoanParameter> lp) {
-    	return service.create(lp)
-    		.doOnNext(l -> LOGGER.info("Создание параметров кредита, идентификатор парметров: {}, идентификатор задачи: {}.",
-				l.getLoanParameterId(), l.getTaskId()))
-    		.map(savedLP -> ResponseEntity.status(HttpStatus.CREATED).body(savedLP));
-	}
+          )
+      ),
+      @ApiResponse(
+        responseCode = "409",
+        description = "Не удается создать запись по заданным параметрам, т.к. запись уже существует.",
+        content = @Content(
+          mediaType = MediaType.APPLICATION_JSON_VALUE,
+          array = @ArraySchema(
+            schema = @Schema(
+              name = "Error",
+              implementation = Error.class
+            )
+          )
+        )
+      )
+    }
+  )
+  @PostMapping
+  Mono<ResponseEntity<LoanParameter>> create(
+    @Parameter(description = "Параметры кредита.")
+    @Valid
+    @RequestBody Mono<LoanParameter> lp) {
+    return service.create(lp)
+      .doOnNext(l -> LOGGER.info("Создание параметров кредита, идентификатор парметров: {}, идентификатор задачи: {}.",
+        l.getLoanParameterId(), l.getTaskId()))
+      .map(savedLP -> ResponseEntity.status(HttpStatus.CREATED).body(savedLP));
+  }
 }

@@ -27,19 +27,19 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Builder
 public class LoanParameter {
-    /**Идентификатор задачи.*/
-    @Column("task_id")
-    private Long taskId;
+  /**Идентификатор задачи.*/
+  @Column("task_id")
+  private Long taskId;
 
-    /**Идентификатор парметров кредита.*/
-    @Column("loan_parameter_id")
-    private Long loanParameterId;
+  /**Идентификатор парметров кредита.*/
+  @Column("loan_parameter_id")
+  private Long loanParameterId;
 
-    @Builder.Default
-    @Transient
-    List<Client> clients = Collections.emptyList();
+  @Builder.Default
+  @Transient
+  List<Client> clients = Collections.emptyList();
 
-    @Builder.Default
-    @Transient
-    List<Collateral> collaterals = Collections.emptyList();
+  @Builder.Default
+  @Transient
+  List<Collateral> collaterals = Collections.emptyList();
 }

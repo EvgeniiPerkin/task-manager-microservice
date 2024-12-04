@@ -24,74 +24,74 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class Task {
-    /**Идентификатор.*/
-    @Id
-    @Column("id")
-    private Long id;
+  /**Идентификатор.*/
+  @Id
+  @Column("id")
+  private Long id;
 
-    /**Дата и время создания.*/
-    @Column("created_at")
-	private OffsetDateTime createdAt;
+  /**Дата и время создания.*/
+  @Column("created_at")
+  private OffsetDateTime createdAt;
 
-    /**Тема.*/
-    @Column("theme_id")
-    private Long themeId;
-    @Transient
-    private Theme theme;
+  /**Тема.*/
+  @Column("theme_id")
+  private Long themeId;
+  @Transient
+  private Theme theme;
 
-    /**Приоритет.*/
-    @Column("priority_id")
-    private Long priorityId;
-    @Transient
-    private Priority priority;
+  /**Приоритет.*/
+  @Column("priority_id")
+  private Long priorityId;
+  @Transient
+  private Priority priority;
 
-    /**Состояние.*/
-    @Column("condition_id")
-    private Long conditionId;    
-    @Transient
-    private Condition condition;
+  /**Состояние.*/
+  @Column("condition_id")
+  private Long conditionId;    
+  @Transient
+  private Condition condition;
 
-    /**Идентификатор отдела, который поставили задачу.*/
-    @Column("from_department_id")
-    private Long fromDepartmentId;
-    
-    /**Идентификатор сотрудника создавшего задачу.*/
-    @Column("from_employee_id")
-    private Long fromEmployeeId;
+  /**Идентификатор отдела, который поставили задачу.*/
+  @Column("from_department_id")
+  private Long fromDepartmentId;
 
-    /**Идентификатор отдела, которому поставили задачу.*/
-    @Column("to_department_id")
-    private Long toDepartmentId;
+  /**Идентификатор сотрудника создавшего задачу.*/
+  @Column("from_employee_id")
+  private Long fromEmployeeId;
 
-    /**Идентификатор сотрудника выполняющиего\ответственного за задачу.*/
-    @Column("to_employee_id")
-    private Long toEmployeeId;
+  /**Идентификатор отдела, которому поставили задачу.*/
+  @Column("to_department_id")
+  private Long toDepartmentId;
 
-    /**Заголовок задачи.*/
-    @Column("title")
-    private String title;
-    
-    /**Содержание\Описание задачи.*/
-    @Column("content")
-    private String content;
+  /**Идентификатор сотрудника выполняющиего\ответственного за задачу.*/
+  @Column("to_employee_id")
+  private Long toEmployeeId;
 
-    /**Планируемая дата и время начала выполнения задачи.*/
-    @Column("planned_start_dt")
-	private OffsetDateTime plannedStartDateTime;
+  /**Заголовок задачи.*/
+  @Column("title")
+  private String title;
 
-    /**Планируемая дата и время завершения задачи.*/
-    @Column("planned_end_dt")
-	private OffsetDateTime plannedEndDateTime;
+  /**Содержание\Описание задачи.*/
+  @Column("content")
+  private String content;
 
-    /**Фактическая дата и время начала выполнения задачи.*/
-    @Column("actual_start_dt")
-	private OffsetDateTime actualStartDateTime;
+  /**Планируемая дата и время начала выполнения задачи.*/
+  @Column("planned_start_dt")
+  private OffsetDateTime plannedStartDateTime;
 
-    /**Фактическая дата и время завершения задачи.*/
-    @Column("actual_end_dt")
-	private OffsetDateTime actualEndDateTime;
+  /**Планируемая дата и время завершения задачи.*/
+  @Column("planned_end_dt")
+  private OffsetDateTime plannedEndDateTime;
 
-    /**Данные по параметрам кредита.*/
-    @Transient
-    private LoanParameter loanParameter;
+  /**Фактическая дата и время начала выполнения задачи.*/
+  @Column("actual_start_dt")
+  private OffsetDateTime actualStartDateTime;
+
+  /**Фактическая дата и время завершения задачи.*/
+  @Column("actual_end_dt")
+  private OffsetDateTime actualEndDateTime;
+
+  /**Данные по параметрам кредита.*/
+  @Transient
+  private LoanParameter loanParameter;
 }
